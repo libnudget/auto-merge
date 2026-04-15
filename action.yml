@@ -1,0 +1,34 @@
+---
+name: Auto Merge
+description: Enable or disable PR auto-merge
+
+inputs:
+  action:
+    description: Action to take (enable, disable)
+    required: false
+    default: enable
+  repo:
+    description: Repository
+    required: false
+    default: ${{ github.repository }}
+
+runs:
+  using: composite
+  steps:
+    - name: Enable auto-merge
+      if: inputs.action == 'enable'
+      shell: bash
+      run: |
+        gh pr merge --auto --squash "$PR_URL" --repo ${{ inputs.repo }}
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Disable auto-merge
+      if: inputs.action == 'disable'
+      shell: bash
+      run: |
+        gh pr merge --disable-auto "$PR_URL" --repo ${{ inputs.repo }}
+      env:
+        PR_URL: ${{ github.event.pull_request.html_url }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
