@@ -3,32 +3,45 @@ name: Auto Merge
 description: Enable or disable PR auto-merge
 
 inputs:
-  action:
-    description: Action to take (enable, disable)
-    required: false
+  mode:
+    description: 'Mode: enable, disable'
+    required: true
     default: enable
   repo:
-    description: Repository
+    description: Repository (owner/name)
     required: false
     default: ${{ github.repository }}
+  branch:
+    description: Branch to merge into
+    required: false
+    default: main
 
 runs:
   using: composite
   steps:
-    - name: Enable auto-merge
-      if: inputs.action == 'enable'
+    - name: Get PR number
+      id: pr
       shell: bash
       run: |
-        gh pr merge --auto --squash "$PR_URL" --repo ${{ inputs.repo }}
+        echo "pr_num=${PR_URL##*/}" >> $GITHUB_OUTPUT
       env:
         PR_URL: ${{ github.event.pull_request.html_url }}
+
+    - name: Enable auto-merge
+      if: inputs.mode == 'enable'
+      shell: bash
+      run: gh pr merge --auto --squash "$PR_NUM" -R "$REPO" -b "$BRANCH"
+      env:
+        PR_NUM: ${{ steps.pr.outputs.pr_num }}
+        REPO: ${{ inputs.repo }}
+        BRANCH: ${{ inputs.branch }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Disable auto-merge
-      if: inputs.action == 'disable'
+      if: inputs.mode == 'disable'
       shell: bash
-      run: |
-        gh pr merge --disable-auto "$PR_URL" --repo ${{ inputs.repo }}
+      run: gh pr merge --disable-auto "$PR_NUM" -R "$REPO"
       env:
-        PR_URL: ${{ github.event.pull_request.html_url }}
+        PR_NUM: ${{ steps.pr.outputs.pr_num }}
+        REPO: ${{ inputs.repo }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
