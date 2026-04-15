@@ -4,8 +4,16 @@ Enable or disable PR auto-merge.
 
 ## What it does
 
-- Enables auto-merge (waits for checks then merges)
-- Disables auto-merge (when label removed)
+- `enable` - Waits for checks to pass, then merges
+- `disable` - Cancels auto-merge
+- `now` - Merges immediately (skip checks)
+
+## Labels
+
+| Label | Mode | Behavior |
+|-------|------|----------|
+| `auto-merge` | enable | Waits for checks, then merges |
+| `auto-merge-now` | now | Merges immediately |
 
 ## Trigger
 
@@ -28,30 +36,23 @@ jobs:
       - uses: libnudget/auto-merge@v1
         with:
           mode: enable
+
+  auto-merge-now:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'auto-merge-now')
+    steps:
+      - uses: libnudget/auto-merge@v1
+        with:
+          mode: now
 ```
-
-## Trigger by Label
-
-Add label `auto-merge` to enable auto-merge.
-Auto-merge starts when all checks pass.
 
 ## Inputs
 
 | Input | Description | Default |
 |-------|-------------|---------|
-| mode | enable or disable | enable |
+| mode | enable, disable, or now | enable |
 | repo | Repository | current |
 | branch | Target branch | main |
-
-## Example
-
-1. Add label `auto-merge` to PR
-2. Bot enables auto-merge
-3. When all checks pass, PR merges automatically
-
-## Remove label
-
-Removing `auto-merge` label disables auto-merge.
 
 ## License
 
