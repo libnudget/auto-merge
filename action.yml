@@ -4,7 +4,7 @@ description: Enable or disable PR auto-merge
 
 inputs:
   mode:
-    description: 'Mode: enable, disable'
+    description: 'Mode: enable, disable, now'
     required: true
     default: enable
   repo:
@@ -45,3 +45,13 @@ runs:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Merge now (skip checks)
+      if: inputs.mode == 'now'
+      shell: bash
+      run: gh pr merge --squash --admin "$PR_NUM" -R "$REPO" -b "$BRANCH"
+      env:
+        PR_NUM: ${{ steps.pr.outputs.pr_num }}
+        REPO: ${{ inputs.repo }}
+        BRANCH: ${{ inputs.branch }}
+        GH_TOKEN: ${{ secrets.BYPASS_TOKEN || secrets.GITHUB_TOKEN }}
