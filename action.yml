@@ -15,6 +15,9 @@ inputs:
     description: Branch to merge into
     required: false
     default: main
+  token:
+    description: GitHub token
+    required: true
 
 runs:
   using: composite
@@ -35,7 +38,7 @@ runs:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
         BRANCH: ${{ inputs.branch }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.token }}
 
     - name: Disable auto-merge
       if: inputs.mode == 'disable'
@@ -44,7 +47,7 @@ runs:
       env:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.token }}
 
     - name: Merge now (skip checks)
       if: inputs.mode == 'now'
@@ -54,4 +57,4 @@ runs:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
         BRANCH: ${{ inputs.branch }}
-        GH_TOKEN: ${{ secrets.BYPASS_TOKEN || secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.token }}
