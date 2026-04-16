@@ -18,6 +18,10 @@ inputs:
   token:
     description: GitHub token
     required: true
+  bypass_token:
+    description: Token that bypasses branch protection (optional)
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -82,4 +86,4 @@ runs:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
         BRANCH: ${{ inputs.branch }}
-        GH_TOKEN: ${{ inputs.token }}
+        GH_TOKEN: ${{ inputs.bypass_token || inputs.token }}
