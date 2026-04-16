@@ -52,7 +52,23 @@ runs:
     - name: Merge now (skip checks)
       if: inputs.mode == 'now'
       shell: bash
-      run: gh pr merge --squash --admin "$PR_NUM" -R "$REPO" -b "$BRANCH"
+      run: |
+        echo "Attempting immediate merge..."
+        echo "PR: $PR_NUM, Repo: $REPO, Branch: $BRANCH"
+        
+        for i in {1..30}; do
+          STATUS=$(gh pr view "$PR_NUM" -R "$REPO" --json mergeable -q '.mergeable')
+          if [ "$STATUS" = "MERGEABLE" ]; then
+            echo "PR is mergeable, attempting merge..."
+            gh pr merge --squash --admin "$PR_NUM" -R "$REPO" -b "$BRANCH" && exit 0
+          fi
+          echo "PR not mergeable yet (attempt $i/30). Checking again in 10s..."
+          sleep 10
+        done
+        
+        echo "PR not mergeable after 5 minutes. Current status:"
+        gh pr view "$PR_NUM" -R "$REPO" --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
+        exit 1
       env:
         PR_NUM: ${{ steps.pr.outputs.pr_num }}
         REPO: ${{ inputs.repo }}
