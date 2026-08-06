@@ -1,5 +1,7 @@
 # Auto Merge
 
+[![Release](https://img.shields.io/github/v/release/libnudget/auto-merge?logo=github&label=latest)](https://github.com/libnudget/auto-merge/releases)
+
 Enable or disable PR auto-merge.
 
 ## What it does
