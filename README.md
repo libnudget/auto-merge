@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Coccinella-Labs/auto-merge/main/.github/assets/thumbnail.png" alt="auto-merge" width="100%">
+</p>
+
 # Auto Merge
 
 [![Release](https://img.shields.io/github/v/release/libnudget/auto-merge?logo=github&label=latest)](https://github.com/libnudget/auto-merge/releases)
